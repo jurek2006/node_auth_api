@@ -1,0 +1,19 @@
+{
+  "name": "node_auth_api",
+  "version": "1.0.0",
+  "description": "API z autentykacją, dla utrwalenia, na podstawie kursu nodejs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jurek2006/node_auth_api.git"
+  },
+  "author": "Jurek Skowron",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jurek2006/node_auth_api/issues"
+  },
+  "homepage": "https://github.com/jurek2006/node_auth_api#readme"
+}
