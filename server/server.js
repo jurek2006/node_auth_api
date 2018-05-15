@@ -1,3 +1,4 @@
+// server/server.js
 const express = require('express');
 
 const app = express();
@@ -11,3 +12,5 @@ if(!module.parent){
         console.log('Server started on port 3000');
     });
 }
+
+module.exports = {app}
