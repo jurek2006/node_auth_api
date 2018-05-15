@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/jurek2006/node_auth_api/issues"
   },
-  "homepage": "https://github.com/jurek2006/node_auth_api#readme"
+  "homepage": "https://github.com/jurek2006/node_auth_api#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
 }
