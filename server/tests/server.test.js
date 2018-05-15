@@ -1,6 +1,5 @@
 // server/tests/server.test.js
 const request = require('supertest'); //do testowania zapytań 
-const expect = require('expect'); //biblioteka do asercji https://github.com/mjackson/expect
 
 const {app} = require('../server');
 
