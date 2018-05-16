@@ -1,6 +1,20 @@
 // server/server.js
 const express = require('express');
 
+const {mongoose} = require('./db/mongoose');
+const {Todo} = require('./models/todo');
+
+const newTodo = new Todo({
+    text: 'Jakis tekst nowy'
+});
+
+newTodo.save().then( doc => {
+    console.log('Saved todo', doc);
+}).catch(err => {
+    console.log('Unable to save todo', err);
+    
+});
+
 const app = express();
 
 app.get('/', (req, res) => {
