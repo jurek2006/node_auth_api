@@ -23,6 +23,7 @@ const {User} = require('./models/user');
 const app = express();
 app.use(bodyParser.json());
 
+// route dodająca todo (z polem text) do bazy
 app.post('/todos', (req, res) => {
     console.log(req.body);
 
@@ -35,6 +36,15 @@ app.post('/todos', (req, res) => {
     newTodo.save()
     .then( doc => {
         res.send(doc);
+    }).catch(err => {
+        res.status(400).send(err);
+    });
+});
+
+// route zwracająca wszystkie todos z bazy danych
+app.get('/todos', (req, res) => {
+    Todo.find({}).then(todos => {
+        res.send({todos})
     }).catch(err => {
         res.status(400).send(err);
     });

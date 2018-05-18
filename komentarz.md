@@ -36,7 +36,7 @@ W modelu Todo dodajemy wymagalność pola text, jak i jego minimalną długość
 W server.test.js dodajemy test route POST /todos (trzeba pamiętać o importowaniu modułu Todo)
 Test sprawdza, czy dostaniemy w odpowiedzi status 200 i w body odpowiedzi text z dodawanego todo. Oraz w bazie danych czy znajduje się jeden todo, z przekazanym text.
 
-Drugi test sprawdza, czy zwracany jest błąd, gdy nie przekaże się wartości pola text.
+Drugi test sprawdza, czy zwracany jest błąd, gdy nie przekaże się wartości pola
 
 ### beforeEach
 Dodajemy beforeEach powodujące usunięcie wszystkich todos z bazy.
@@ -52,3 +52,33 @@ Już było wcześniej dodane:
 
 Teraz będzie można uruchomić testy w konsoli poleceniem:
 ```npm run test``` i ```npm run test-watch```
+
+-----
+# GET /todos - wyświetlanie danych
+
+
+
+## dodanie GET /todos
+W route wyszukujemy wszystkie dokumenty w todos za pomocą ```Todo.find({})``` i zwracamy je w obiekcie. Jeśli nastąpi błąd pobierania todos, to zwracamy status 400 i error
+```
+app.get('/todos', (req, res) => {
+    Todo.find({}).then(todos => {
+        res.send({todos})
+    }, err => {
+        res.status(400).send(err);
+    })
+});
+```
+
+Co równoznacznie można zapisać również:
+```
+app.get('/todos', (req, res) => {
+    Todo.find({}).then(todos => {
+        res.send({todos})
+    }).catch(err => {
+        res.status(400).send(err);
+    });
+});
+```
+
+
