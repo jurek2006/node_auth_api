@@ -101,3 +101,59 @@ beforeEach(done => {
 });
 ```
 W teście na poprawne dodawanie todo teraz musimy wyszukiwać todo o zadanym text ```Todo.find({text: todo_text})...``` a w teście na niepoprawne ilość znalezionych wszystkich todos musi być 2
+
+-----
+# GET /todos/:id Pobieranie pojedynczego todo 
+Pobierać będziemy todo o id przekazanym w ścieżce, np.:
+```localhost:3000/todos/1234```
+
+## Pobranie parametru req.params
+Parametr (tutaj id) będziemy pobierać z req.params czyli 
+```
+const id = req.params.id;
+```
+
+## ObjectID
+W bazie MongoDB id jest instancją klasy ObjectID. Dzięki Mongoose nie musimy konwertować id ze stringa na ObjectID - Mongoose zrobi to za nas. 
+
+**Jeśli w kwerendzie przekażemy id, które nie jest prawidłowym ObjectID - zostanie rzucony błąd. Natomiast jeśli przekażemy id, które jest prawidłowym ObjectID ale nie ma żadnego elementu o takim id, to zwrócona zostanie pusta tablica lub null**
+
+### ObjectID.isValid()
+Można obsłużyć błędne id w następujący sposób:
+Najpierw importujemy ObjectID z modułu mongodb
+```
+const {ObjectID} = require('mongodb');
+```
+
+A następnie sprawdzamy, czy id jest poprawne i jeśli nie - zwracamy np. 404:
+```
+if(!ObjectID.isValid(id)){
+        return res.status(404).send();
+    }
+```
+
+Teraz kolejnym etapem jest sprawdzenie czy nie zwrócono pustej tablicy lub null (j.w. id poprawne, ale nie ma dla niego żadnego todo):
+```
+Todo.findById(id).then(todo => {
+        if(!todo) {
+            return res.status(404).send();
+        }
+        res.send({todo});
+    }).catch(err => res.status(400).send());
+```
+
+## Sprawdzenie czy działa
+Sprawdzić można w postman, dodając todo za pomocą POST localhost:3000/todos i przekazania odpowiedniego obiektu w header. Jak zostanie dodany to zwrócone zostanie coś w stylu:
+```
+{
+    "todo": {
+        "_id": "5afe904449ddc01dce10cbba",
+        "text": "jurek",
+        "__v": 0
+    }
+}
+```
+
+I wtedy można skopiować wartość _id i zrobić nowe zapytanie
+```localhost:3000/todos/5afe904449ddc01dce10cbba```
+Powinno zwrócić szukany dokument
