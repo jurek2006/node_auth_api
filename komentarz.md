@@ -81,4 +81,23 @@ app.get('/todos', (req, res) => {
 });
 ```
 
+---------
+# Testowanie GET /todos
 
+## Modyfikacja beforeEach
+Modyfikujemy tak, żeby przed każdym testem usuwał z bazy wszystkie todo i dodawał dwa z todos (co musimy uwzględnić w testach)
+
+Używamy **Todo.insertMany** i robimy łańcuch promis:
+```
+const todos = [
+    {text: 'First todo'},
+    {text: 'Second todo'}
+];
+
+beforeEach(done => {
+    Todo.remove({}).then(() => {
+        Todo.insertMany(todos);
+    }).then(() => done());
+});
+```
+W teście na poprawne dodawanie todo teraz musimy wyszukiwać todo o zadanym text ```Todo.find({text: todo_text})...``` a w teście na niepoprawne ilość znalezionych wszystkich todos musi być 2

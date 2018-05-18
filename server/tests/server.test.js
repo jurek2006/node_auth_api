@@ -4,8 +4,15 @@ const request = require('supertest'); //do testowania zapytań
 const {app} = require('../server');
 const {Todo} = require('../models/todo');
 
+const todos = [
+    {text: 'First todo'},
+    {text: 'Second todo'}
+];
+
 beforeEach(done => {
-    Todo.remove({}).then(() => done());
+    Todo.remove({}).then(() => {
+        Todo.insertMany(todos);
+    }).then(() => done());
 });
 
 describe('server.js', () => {
@@ -38,7 +45,7 @@ describe('server.js', () => {
                     return done(err);
                 }
 
-                Todo.find().then(todos => {
+                Todo.find({text: todo_text}).then(todos => {
                     expect(todos.length).toBe(1);
                     expect(todos[0].text).toBe(todo_text);
                     done();
@@ -57,7 +64,7 @@ describe('server.js', () => {
                 }
 
                 Todo.find().then(todos => {
-                    expect(todos.length).toBe(0);
+                    expect(todos.length).toBe(2);
                     done();
                 }).catch(err => done(err));
             })
