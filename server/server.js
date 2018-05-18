@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 app.post('/todos', (req, res) => {
     console.log(req.body);
 
-    // zapisanie testowego todo
+    // zapisanie przekazanego todo
     const newTodo = new Todo({
         
         text: req.body.text

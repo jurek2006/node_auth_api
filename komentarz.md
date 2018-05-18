@@ -20,3 +20,35 @@ Efekt powinien być taki, że konsola wyświetli zadany "to-do" i zostanie on do
     "__v": 0
 }
 ```
+-------------------------------------
+# Testowanie POST /todos
+*Potrzebujemy do tego modułów jest i supertest (w kursie były expect@1.20.2 mocha@3.0.2 nodemon@1.10.2 supertest@2.0.0 ale eksperymentuję z jest)*
+
+## Eksport app w server.js
+Jest potrzebne do testowania
+
+```module.exports = {app}```
+
+### Dodanie wymagania pola w mongoose
+W modelu Todo dodajemy wymagalność pola text, jak i jego minimalną długość i przycinanie.
+
+## Test server.test.js
+W server.test.js dodajemy test route POST /todos (trzeba pamiętać o importowaniu modułu Todo)
+Test sprawdza, czy dostaniemy w odpowiedzi status 200 i w body odpowiedzi text z dodawanego todo. Oraz w bazie danych czy znajduje się jeden todo, z przekazanym text.
+
+Drugi test sprawdza, czy zwracany jest błąd, gdy nie przekaże się wartości pola text.
+
+### beforeEach
+Dodajemy beforeEach powodujące usunięcie wszystkich todos z bazy.
+
+## Skrypt testów w package.json
+Już było wcześniej dodane:
+```
+"scripts": {
+    "test": "jest",
+    "test-watch": "nodemon --exec \"npm test\""
+  },
+```
+
+Teraz będzie można uruchomić testy w konsoli poleceniem:
+```npm run test``` i ```npm run test-watch```
