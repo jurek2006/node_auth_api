@@ -157,3 +157,56 @@ Sprawdzić można w postman, dodając todo za pomocą POST localhost:3000/todos 
 I wtedy można skopiować wartość _id i zrobić nowe zapytanie
 ```localhost:3000/todos/5afe904449ddc01dce10cbba```
 Powinno zwrócić szukany dokument
+
+-----
+# Testowanie GET /todos/:id
+
+## new ObjectID()
+Jeśli chcemy w testach generować prawidłowe ObjectID można to zrobić po prostu tworząc nową instancję tej klasy ```_id: new ObjectID()```
+
+## Modyfikacja todos dodawanych w teście
+Modyfikujemy todos, tak żeby miały _id (bo będziemy po nich wyszukiwać)
+```
+const todos = [
+    {_id: new ObjectID(), text: 'First todo'},
+    {_id: new ObjectID(), text: 'Second todo'}
+];
+```
+
+## Test poprawnego zwrócenia todo o zadanym id
+Sprawdzamy czy status jest 200 i czy dla znalezionego todo jest odpowiadający mu text. 
+```
+describe('GET /todos/:id', () => {
+        test('should get todo with doc matching given id', done => {
+            request(app)
+            .get(`/todos/${todos[0]._id}`)
+            .expect(200)
+            .expect(res => {
+                expect(res.body.todo.text).toBe(todos[0].text);
+            })
+            .end(done)
+        });
+    });
+```
+## Test sytuacji, kiedy nie ma żadnego todo dla zadanego id
+id jest prawidłowym ObjectID (generujemy nowe za pomocą ```new ObjectID()```) - zapytanie powinno zwrócić status 404
+
+```
+test('should return 404 if todo not found', done => {
+            request(app)
+            .get(`/todos/${new ObjectID()}`)
+            .expect(404)
+            .end(done);
+        });
+```
+
+## Test sytuacji, kiedy id nie jest prawidłowe
+id nie jest prawidłowym ObjectID. Testujemy j.w. dla dowolnego stringa id
+```
+test('shpult return 404 for non-object ids', done => {
+            request(app)
+            .get('/todos/123')
+            .expect(404)
+            .end(done);
+        });
+```
