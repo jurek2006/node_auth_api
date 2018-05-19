@@ -210,3 +210,65 @@ test('shpult return 404 for non-object ids', done => {
             .end(done);
         });
 ```
+--------
+# Ustawianie modelu user
+
+## Uniqe - Wymuszanie unikalnego pola email w user
+W modelu user dodajemu unique dla pola email
+
+```
+email: {
+        type: String,
+        required: true,
+        minlength: 1,
+        trim: true,
+        unique: true
+    }
+```
+
+## Validator
+Instalujemy validator
+```npm install validator --save```
+
+Importujemy go w modelu user.js i ustawiamy validate:
+```
+validate: {
+            validator: validator.isEmail,
+            message: '{VALUE} is not a valid email'
+        }
+```
+
+## Pola password i tokens
+Dodajemy pole, które będzie przechowywać hash hasła i tokens, gdzie będą zapisywane tokenty niezbędne do weryfikacji czy użytkownik jest zalogowany
+
+Model teraz wygląda następująco:
+```
+const User = mongoose.model('User', {
+// Model user - z jednym polem email, będącym wymaganym stringiem, przycinanym (trim) o długości min 1 znaku
+    email: {
+        type: String,
+        required: true,
+        minlength: 1,
+        trim: true,
+        unique: true, 
+        validate: {
+            validator: validator.isEmail,
+            message: '{VALUE} is not a valid email'
+        }
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    tokens: [{
+        access: {
+            type: String,
+            required: true
+        },
+        token: {
+            type: String,
+
+        }
+    }]
+});
+```

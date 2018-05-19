@@ -8,25 +8,11 @@ const {ObjectID} = require('mongodb');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 
-// zapisanie testowego użytkownika
-// const newUser = new User({
-    
-//     email: 'user testowy'
-// });
-
-// newUser.save().then( doc => {
-//     console.log('Saved user', doc);
-// }).catch(err => {
-//     console.log('Unable to save user', err);
-    
-// });
-
 const app = express();
 app.use(bodyParser.json());
 
 // route dodająca todo (z polem text) do bazy
 app.post('/todos', (req, res) => {
-    console.log(req.body);
 
     // zapisanie przekazanego todo
     const newTodo = new Todo({
