@@ -272,3 +272,38 @@ const User = mongoose.model('User', {
     }]
 });
 ```
+
+----
+# POST /users - route do tworzenia użytkowników
+
+## Modyfikacja beforeEach i beforeAll
+Tak, żeby nie uruchamiały się zbędnie np. przed każdym testem, który nie modyfikuje danych
+
+## Instalacja lodash
+```npm i --save lodash```
+
+Importujemy za pomocą:
+```const _ = require('lodash');```
+
+## Utworzenie nowej instancji User
+Za pomocą lodash wybieramy z zapytania tylko pole email i password
+```const user = new User(_.pick(req.body, ['email', 'password']));```
+
+## Zapisanie użytkownika
+Jeśli uda się zapisać zwracamy dane użytkownika, jeśli się nie uda, to zwracamy 400 i kod błędu
+
+```
+// route do tworzenia użytkowników
+app.post('/users', (req, res) => {
+    const user = new User(_.pick(req.body, ['email', 'password']));
+
+    user.save()
+        .then(user => {
+            res.send(user);
+        })
+        .catch(err => {
+            res.status(400).send(err);
+        });
+});
+```
+

@@ -10,26 +10,18 @@ const todos = [
     {_id: new ObjectID(), text: 'Second todo'}
 ];
 
-beforeEach(done => {
+const todosRemoveAndAdd = done => {
+// funkcja usuwająca wszystkie todos i dodające te z tablicy todos, używana przed poszczególnymi testami lub zestawami testów
     Todo.remove({}).then(() => {
         Todo.insertMany(todos);
     }).then(() => done());
-});
+}
 
 describe('server.js', () => {
 
-    describe('GET /', () => {
-
-        it('should return welcome response', done => {
-            request(app)
-            .get('/')
-            .expect(200)
-            .expect('<h1>Witaj w node-auth-api</h1>') //sprawdzenie zgodności zwracanej treści
-            .end(done);
-        });
-    });
-
     describe('POST /todos', () => {
+
+        beforeEach(done => todosRemoveAndAdd(done)); //przed każdym z testów, bo modyfikują one todos
 
         test('should create a new todo', done => {
             const todo_text = 'Test todo';
@@ -73,6 +65,8 @@ describe('server.js', () => {
     });
 
     describe('GET /todos/:id', () => {
+        beforeAll(done => todosRemoveAndAdd(done)); //przed wszystkimi testami (raz), bo nie modyfikują one todos
+
         test('should get todo with doc matching given id', done => {
             request(app)
             .get(`/todos/${todos[0]._id}`)

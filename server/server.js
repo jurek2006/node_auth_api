@@ -1,6 +1,7 @@
 // server/server.js
 const express = require('express');
 const bodyParser = require('body-parser');
+const _ = require('lodash');
 
 const {mongoose} = require('./db/mongoose');
 const {ObjectID} = require('mongodb');
@@ -56,6 +57,19 @@ app.get('/todos/:id', (req, res) => {
 
 app.get('/', (req, res) => {
     res.send('<h1>Witaj w node-auth-api</h1>');
+});
+
+// route do tworzenia użytkowników
+app.post('/users', (req, res) => {
+    const user = new User(_.pick(req.body, ['email', 'password']));
+
+    user.save()
+        .then(user => {
+            res.send(user);
+        })
+        .catch(err => {
+            res.status(400).send(err);
+        });
 });
 
 if(!module.parent){
