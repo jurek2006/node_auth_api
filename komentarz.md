@@ -306,4 +306,67 @@ app.post('/users', (req, res) => {
         });
 });
 ```
+## Instalacja jsonwebtoken
+```npm i jsonwebtoken --save```
+I importujemy w user.js
 
+## Tworzymy UserSchema w modelu User
+Dodajemy do UserSchema, na podstawie którego tworzony jest model User metody instancji
+
+### generateAuthToken
+Tworzymy metodę instancji (modelu User) generateAuthToken, która będzie generowała tokeny autoryzacji. Używamy zwykłej konstrukcji funkcji, zamiast arrow function, bo potrzebujemt this, która będzie wskazywała na instancję. 
+Na razie zapisujemy "sekretną wartość" w jwt.sign (później przeniesiemy ją do pliku konfiguracji)
+
+### uruchomienie user.generateAuthToken w route POST /users - zwracanie tokenu
+Teraz chcemy, żeby przy zapisywaniu użytkownika token był generowany i zwracany w nagłówku odpowiedzi jako własne pole x-auth (własne pola w nagłówku mają nazwy x-...)
+```
+user.save()
+        .then(user => {
+            return user.generateAuthToken();
+        })
+        .then(token => {
+            res.header('x-auth', token).send(user);
+        })
+        .catch(err => {
+            res.status(400).send(err);
+        });
+```
+### Sprawdzenie
+Teraz w postman próbujemy stworzyć nowego użytkownika. W odpowiedzi powinien być token, w stylu:
+```
+{
+    "__v": 1,
+    "email": "nowyQ@wp.pl",
+    "password": "qwerfgh",
+    "_id": "5ab20d074ac0a3bc1c25ff5a",
+    "tokens": [
+        {
+            "access": "auth",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YWIyMGQwNzRhYzBhM2JjMWMyNWZmNWEiLCJhY2Nlc3MiOiJhdXRoIiwiaWF0IjoxNTIxNjE4MTgzfQ.i1ffFrk1qxdeg0A1_Pb9SYmdgI380w4PLaJynHsca0o",
+            "_id": "5ab20d074ac0a3bc1c25ff5b"
+        }
+    ]
+}
+```
+W header odpowiedzi powinien być x-auth z tym właśnie tokenem
+
+## UserSchema.methods.toJSON
+Za pomocą nadpisania metody toJSON ( która określa, co jest zwracana, gdy mode mongoose jest konwertowany do wartości JSON) ograniczamy zwracane w zapytaniu informacje tylko do email i _id - nie chcemy pokazywać hasła ani tokenów
+
+```
+UserSchema.methods.toJSON = function(){
+    const user = this;
+    const userObject = user.toObject();
+
+    return _.pick(userObject, ['email', '_id']);
+}
+```
+
+Teraz odpowiedź wygląda w stylu:
+```
+{
+    "email": "antek@mail.pl",
+    "_id": "5b0383351159a35ad3f79b95"
+}
+```
+Oczywiście x-auth jest w headers

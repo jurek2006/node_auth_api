@@ -63,9 +63,15 @@ app.get('/', (req, res) => {
 app.post('/users', (req, res) => {
     const user = new User(_.pick(req.body, ['email', 'password']));
 
+    console.log(req.body);
+    
+
     user.save()
         .then(user => {
-            res.send(user);
+            return user.generateAuthToken();
+        })
+        .then(token => {
+            res.header('x-auth', token).send(user);
         })
         .catch(err => {
             res.status(400).send(err);
