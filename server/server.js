@@ -8,6 +8,7 @@ const {ObjectID} = require('mongodb');
 
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
+const {authenticate} = require('./middleware/middleware');
 
 const app = express();
 app.use(bodyParser.json());
@@ -78,18 +79,11 @@ app.post('/users', (req, res) => {
         });
 });
 
-// prywatna route
-app.get('/users/me', (req, res) => {
-    const token = req.header('x-auth');
+// ROUTES Z AUTENTYKACJĄ
 
-    User.findByToken(token).then(user => {
-        if(!user){
-            return Promise.reject();
-        }
-        res.send(user);
-    }).catch(err => {
-        res.status(401).send();
-    });
+// prywatna route
+app.get('/users/me', authenticate, (req, res) => {
+    res.send(req.user);
 });
 
 if(!module.parent){

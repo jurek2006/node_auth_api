@@ -477,3 +477,58 @@ if(!user){
             return Promise.reject();
         }
 ```
+# Przenoszenie autentykacji do middleware
+
+Chcemy teraz podzielić kod, żeby uzyskać middleware do autentykacji, z którego będzie można korzystać w innych route
+
+## Funkcja middleware authenticate
+Tworzymy funkcję authenticate w server.js
+```
+const authenticate = (req, res, next) => {
+    const token = req.header('x-auth');
+
+    User.findByToken(token).then(user => {
+        if(!user){
+            return Promise.reject();
+        }
+
+        req.user = user;
+        req.token = token;
+        next();
+    }).catch(err => {
+        res.status(401).send();
+    });
+};
+```
+Żeby ją użyć wystarczy przekazać jako parametr w route:
+```
+app.get('/users/me', authenticate, (req, res) => {
+    res.send(req.user);
+});
+```
+
+## Przeniesienie authenticate do nowego pliku
+Tworzymy plik server/middleware/authenticate.js i przenosimy do niego funkcję authenticate (a w server.js tylko ją importujemy)
+
+```
+const {User} = require('./../models/user');
+
+// middleware używana w routes z autentykacją
+const authenticate = (req, res, next) => {
+    const token = req.header('x-auth');
+
+    User.findByToken(token).then(user => {
+        if(!user){
+            return Promise.reject();
+        }
+
+        req.user = user;
+        req.token = token;
+        next();
+    }).catch(err => {
+        res.status(401).send();
+    });
+};
+
+module.exports = {authenticate}
+```
