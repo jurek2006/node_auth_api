@@ -370,3 +370,110 @@ Teraz odpowiedź wygląda w stylu:
 }
 ```
 Oczywiście x-auth jest w headers
+
+# GET /users/me - Prywatna route
+Dodajemy teraz route, która będzie wymagała autentykacji
+
+## req.header() pozwala na odczytanie nagłówków
+analogicznie jak res.header pozwala na ich wysłanie
+
+## User.findByToken
+Dodajemy metodę findByToken - jest to metoda statyczna - metoda modelu, a nie instancji (dlatego tworzymy ją w UserSchema.statics, a nie w UserSchema.methods)
+
+```
+UserSchema.statics.findByToken = function(token){
+    const User = this; //odwołanie do modelu
+    let decoded;
+
+    try{
+        decoded = jwt.verify(token, 'secret123');
+    } catch (err){
+
+    }
+
+    return User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    });
+}
+```
+## Prywatna route GET /users/me
+W route korzystamy z metody findByToken
+```
+app.get('users/me', (req, res) => {
+    const token = req.header('x-auth');
+
+    User.findByToken(token).then(user => {
+        if(!user){
+
+        }
+        res.send(user);
+    })
+});
+```
+Teraz gdy testowo stworzymy zapytanie z tokenem użytkownika w headers, to powinniśmy dostać jego email i _id
+
+## Obsługa niepowodzenia weryfikacji tokenu
+W catch zwracamy nową promisę z reject
+```
+UserSchema.statics.findByToken = function(token){
+    const User = this; //odwołanie do modelu
+    let decoded;
+
+    try{
+        decoded = jwt.verify(token, 'secret123');
+    } catch (err){
+        return new Promise((resolve, reject) => {
+            rejjject();
+        }
+    )}
+
+    return User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    });
+}
+```
+
+Ale możemy uprościć
+```
+catch (err){
+        return new Promise((resolve, reject) => {
+            rejjject();
+        }
+    )}
+```
+do
+```
+catch (err){
+        return Promise.reject();
+    }
+```
+
+I w route dodajemy obsługę błędu - zwracającą 401 - unauthorised
+```
+app.get('/users/me', (req, res) => {
+    const token = req.header('x-auth');
+    console.log('token', token);
+    
+
+    User.findByToken(token).then(user => {
+        if(!user){
+
+        }
+        res.send(user);
+    }).catch(err => {
+        res.status(401).send();
+    });
+});
+```
+
+## Obsługa nieznalezienia usera 
+Wystarczy zwrócić reject promisy
+```
+if(!user){
+            return Promise.reject();
+        }
+```
