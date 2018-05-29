@@ -561,4 +561,17 @@ bcrypt.compare(password, hashedPassword, (err, res) => {
 ```
 Res może być true (gdy hasło się zgadza) lub false. 
 
-<!-- Dokończyć mongoose middleware -->
+## mongoose middleware
+http://mongoosejs.com/docs/middleware.html
+
+pozwala na uruchomienie kodu przed lub po określonych zdarzeniach (np. po zdarzeniu update).
+My chcemy uruchamiać kod (hashujący hasło) zanim dokument zostanie zapisany w bazie.
+
+# Wypełnianie bazy testowej użytkownikami
+(Seeding test database with users)
+
+W pliku tests/seed/seed.js definiujemy dane do testów, przenosimy do niego istniejące dane testowe i funkcję używaną w beforeEach.
+
+Następnie dodajemy dwóch użytkowników testowych - jednego z ważnym tokenem aytentykacji, drugiego bez żadnego tokenu autentykacji.
+
+Dodajemy funkcję populateUsers, która usuwa wszystkich użytkowników, a następnie dodaje dwóch powyższych.

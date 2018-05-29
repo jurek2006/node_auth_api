@@ -4,24 +4,16 @@ const {ObjectID} = require('mongodb');
 
 const {app} = require('../server');
 const {Todo} = require('../models/todo');
+const {todos, todosRemoveAndAdd, users, populateUsers} = require('../tests/seed/seed');
 
-const todos = [
-    {_id: new ObjectID(), text: 'First todo'},
-    {_id: new ObjectID(), text: 'Second todo'}
-];
 
-const todosRemoveAndAdd = done => {
-// funkcja usuwająca wszystkie todos i dodające te z tablicy todos, używana przed poszczególnymi testami lub zestawami testów
-    Todo.remove({}).then(() => {
-        Todo.insertMany(todos);
-    }).then(() => done());
-}
+
 
 describe('server.js', () => {
 
     describe('POST /todos', () => {
 
-        beforeEach(done => todosRemoveAndAdd(done)); //przed każdym z testów, bo modyfikują one todos
+        beforeEach(todosRemoveAndAdd); //przed każdym z testów, bo modyfikują one todos
 
         test('should create a new todo', done => {
             const todo_text = 'Test todo';
