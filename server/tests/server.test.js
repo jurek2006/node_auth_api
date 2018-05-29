@@ -84,4 +84,36 @@ describe('server.js', () => {
         });
     });
 
+    describe('test users routes', () => {
+
+        beforeEach(populateUsers);
+        
+        describe('GET /users/me', () => {
+            
+            test('should return user if authenticated', done => {
+                // testowanie route dla zautentyfikowanego użytkownika
+
+                request(app)
+                .get('/users/me')
+                .set('x-auth', users[0].tokens[0].token)
+                .expect(200)
+                .expect(res => {
+                    expect(res.body._id).toBe(users[0]._id.toHexString());
+                    expect(res.body.email).toBe(users[0].email);
+                })
+                .end(done)
+            });
+            
+            test('should return 401 if not authenticated', done => {
+                request(app)
+                .get('/users/me')
+                .expect(401)
+                .expect(res => {
+                    expect(res.body).toEqual({}); //oczekiwane jest zwrócenie pustego obiektu
+                })
+                .end(done)
+            });
+        });
+        
+    });
 });

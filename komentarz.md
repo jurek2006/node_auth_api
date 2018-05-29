@@ -575,3 +575,6 @@ W pliku tests/seed/seed.js definiujemy dane do testów, przenosimy do niego istn
 Następnie dodajemy dwóch użytkowników testowych - jednego z ważnym tokenem aytentykacji, drugiego bez żadnego tokenu autentykacji.
 
 Dodajemy funkcję populateUsers, która usuwa wszystkich użytkowników, a następnie dodaje dwóch powyższych.
+
+# Testowanie routes POST /users i GET /users/me
+Dodajemy tekst GET /users/me dla zautentyfikowanego użytkownika oraz dla niezautentyfikowanego
