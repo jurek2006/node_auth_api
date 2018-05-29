@@ -576,5 +576,26 @@ Następnie dodajemy dwóch użytkowników testowych - jednego z ważnym tokenem 
 
 Dodajemy funkcję populateUsers, która usuwa wszystkich użytkowników, a następnie dodaje dwóch powyższych.
 
-# Testowanie routes POST /users i GET /users/me
-Dodajemy tekst GET /users/me dla zautentyfikowanego użytkownika oraz dla niezautentyfikowanego
+# Testowanie route GET /users/me
+Dodajemy test GET /users/me dla zautentyfikowanego użytkownika (powinien zwrócić dane użytkownika) oraz dla niezautentyfikowanego (powinien zwrócić pusty obiekt)
+
+# Testowanie route POST /users - tworzenia użytkownika
+
+1. Dodajemy test tworzenia użytkownika w którym sprawdzamy, czy użytkownik został dodany, czyli 
+czy w odpowiedzi:
+- jest zdefiniowany nagłówek x-auth
+- jest zdefiniowane _id
+- zwrócony email zgadza się z zadanym dla tworzonego użytkownika
+
+czy w bazie danych można znaleźć użytkownika o takim adresie email, który:
+- istnieje
+- ma hasło inne od zadanego dla tworzonego użytkownika i czy jest niepuste (czy hasło zostało zhashowane)
+
+2. Dodajemy testy kiedy podano nieprawidłowy email (nieprzechodzący walidacji), podano za krótkie hasło, sprawdzamy czy:
+- zwrócono status 400
+- nie dodano użytkownika do bazy danych
+
+3. Kiedy podano za krótkie hasło
+jw.
+
+4. Kiedy istnieje już użytkownik o zadanym email
