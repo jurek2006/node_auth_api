@@ -4,6 +4,7 @@ const {ObjectID} = require('mongodb');
 
 const {app} = require('../server');
 const {Todo} = require('../models/todo');
+const {User} = require('../models/user');
 const {todos, todosRemoveAndAdd, users, populateUsers} = require('../tests/seed/seed');
 
 
@@ -112,6 +113,86 @@ describe('server.js', () => {
                     expect(res.body).toEqual({}); //oczekiwane jest zwrócenie pustego obiektu
                 })
                 .end(done)
+            });
+        });
+
+        describe('POST /users', () => {
+
+            test('should create a user', done => {
+                const email = "nottaken@example.com";
+                const password = "testing";
+
+                request(app)
+                .post('/users')
+                .send({email, password})
+                .expect(200)
+                .expect(res => {
+                    expect(res.headers['x-auth']).toBeDefined();
+                    expect(res.body._id).toBeDefined();
+                    expect(res.body.email).toBe(email);
+                })
+                .end(err => {
+                    if(err){
+                        return done(err);
+                    }
+
+                    User.findOne({email}).then(user => {
+                        expect(user).toBeDefined(); //czy znaleziono użytkownika
+                        expect(user.password).not.toBe(password); //czy hasło zostało zhashowane
+                        expect(user.password.length).toBeGreaterThan(0);
+                        done();
+                    });
+                });
+            });
+
+            test('should return validation errors if email invalid', done => {
+                const email = "notvalid.com";
+                const password = "testing";
+
+                request(app)
+                .post('/users')
+                .send({email, password})
+                .expect(400)
+                .end(err => {
+                    if(err){
+                        return done(err);
+                    }
+
+                    User.findOne({email}).then(user => {
+                        expect(user).toBeFalsy(); //czy nie znaleziono użytkownika
+                        done();
+                    });
+                })
+            });
+
+            test('should return validation errors if password too short', done => {
+                const email = "not@valid.com";
+                const password = "123";
+
+                request(app)
+                .post('/users')
+                .send({email, password})
+                .expect(400)
+                .end(err => {
+                    if(err){
+                        return done(err);
+                    }
+
+                    User.findOne({email}).then(user => {
+                        expect(user).toBeFalsy(); //czy nie znaleziono użytkownika
+                        done();
+                    });
+                })
+            });
+
+            test('should return validation errors if email already in use', done => {
+                const password = "12345678";
+
+                request(app)
+                .post('/users')
+                .send({email: users[0].email, password})
+                .expect(400)
+                .end(done);
             });
         });
         
