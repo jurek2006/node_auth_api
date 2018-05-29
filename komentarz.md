@@ -532,3 +532,33 @@ const authenticate = (req, res, next) => {
 
 module.exports = {authenticate}
 ```
+
+# Hashowanie haseł
+
+## bcryptjs
+Do hashowania haseł używamy bcryptjs
+```npm i bcrypt --save```
+
+https://www.npmjs.com/package/bcryptjs
+
+### Przykład użycia bcrypt
+Hashujemy hasło (z salting) następująco:
+```
+bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.hash(password, salt, (err, hash) => {
+        console.log(hash);
+    });
+});
+```
+
+Teraz gdy chcemy sprawdzić poprawność hasła (np. przy logowaniu) robimy:
+```
+const hashedPassword = '$2a$10$xaf3hd35jUX3fbuT/mNf1.ixmv/92AeWVvyeqT5rZdQsTDSrHAnQ6';
+
+bcrypt.compare(password, hashedPassword, (err, res) => {
+    console.log(res);
+});
+```
+Res może być true (gdy hasło się zgadza) lub false. 
+
+<!-- Dokończyć mongoose middleware -->

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
 // schemat modelu User - z jednym polem email, będącym wymaganym stringiem, przycinanym (trim) o długości min 1 znaku, hasłem i tokenami
@@ -68,6 +69,22 @@ UserSchema.statics.findByToken = function(token){
         'tokens.access': 'auth'
     });
 }
+
+// metoda hashująca hasła przed ich zapisaniem do bazy (mongoose middleware)
+UserSchema.pre('save', function (next){
+    const user = this; //zapisywany użytkownik
+
+    if(user.isModified('password')){
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                user.password = hash;
+                next();
+            });
+        });
+    } else {
+        next();
+    }
+});
 
 const User = mongoose.model('User', UserSchema);
 
