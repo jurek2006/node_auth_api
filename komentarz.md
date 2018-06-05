@@ -610,3 +610,8 @@ Tworzymy route POST /users/login, która weryfikuje za pomocą User.findByCreden
 
 ## Generowanie i wysyłanie tokenu
 Przy logowaniu dodajemy generowanie tokenu autoryzacji, który będzie wysyłany w nagłówku. 
+
+# Testowanie POST /users/login
+Tworzymy dwa testy:
+1. Z poprawnymi danymi logowania - wtedy powinien zostać zwrócony token 
+2. Niepoprawnych danych - nie powinien zostać zwrócony token, status 400 - bad request
