@@ -599,3 +599,14 @@ czy w bazie danych można znaleźć użytkownika o takim adresie email, który:
 jw.
 
 4. Kiedy istnieje już użytkownik o zadanym email
+
+# POST /users/login - route do logowania
+
+## Werifikacja logującego się użytkownika
+Do weryfikowania czy użytkownik o zadanym email i haśle istnieje dodajemy kolejną metodę do modelu User - findByCredentials, która ma zwracać promisę z użytkownikiem (sukces) albo promisę z błędem, jeśli użytkownik nie istnieje. 
+Najpierw musimy wyszukać użytkownika o zadanym email (nie możemy szukać po email i haśle, bo hasło w bazie jest zahashowane)
+
+Tworzymy route POST /users/login, która weryfikuje za pomocą User.findByCredentials czy użytkownik o takim email i haśle istnieje. Jeśli istnieje zwraca usera, jeśli nie - status 400
+
+## Generowanie i wysyłanie tokenu
+Przy logowaniu dodajemy generowanie tokenu autoryzacji, który będzie wysyłany w nagłówku. 

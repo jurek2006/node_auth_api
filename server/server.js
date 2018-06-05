@@ -79,6 +79,20 @@ app.post('/users', (req, res) => {
         });
 });
 
+// route do logowania się
+app.post('/users/login', (req, res) => {
+    const body = _.pick(req.body, ['email', 'password']);
+
+    // weryfikowanie czy użytkownik o takim email i haśle istnieje
+    User.findByCredentials(body.email, body.password).then(user => {
+        return user.generateAuthToken().then(token => {
+            res.header('x-auth', token).send(user);
+        })
+    }).catch(err => {
+        res.status(400).send();
+    });
+});
+
 // ROUTES Z AUTENTYKACJĄ
 
 // prywatna route

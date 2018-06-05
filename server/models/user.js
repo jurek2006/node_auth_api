@@ -71,6 +71,32 @@ UserSchema.statics.findByToken = function(token){
     });
 }
 
+UserSchema.statics.findByCredentials = function(email, password){
+    const User = this; //odwołanie do modelu
+
+    // najpierw wyszukujemy użytkownika o zadanym email
+    return User.findOne({email}).then(user => {
+        if(!user){
+            console.log(`find one nie znalazł użytkownika ${email}`);
+            
+            return Promise.reject();
+        }
+
+        return new Promise((resolve, reject) => {
+            // używamy bcrypt.compare do porównania zadanego hasła (password) i user.password
+            // jeśli się zgadzają (res jest true) wywołujemy resolve(user)
+            // jeśli się nie zgadzają wywołujemy reject
+            bcrypt.compare(password, user.password, (err, res) => {
+                if(res){
+                    resolve(user);
+                } else {
+                    reject();
+                }
+            })
+        });
+    });
+}
+
 // metoda hashująca hasła przed ich zapisaniem do bazy (mongoose middleware)
 UserSchema.pre('save', function (next){
     const user = this; //zapisywany użytkownik
