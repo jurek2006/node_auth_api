@@ -616,5 +616,8 @@ Tworzymy dwa testy:
 1. Z poprawnymi danymi logowania - wtedy powinien zostać zwrócony token 
 2. Niepoprawnych danych - nie powinien zostać zwrócony token, status 400 - bad request
 
-# Wylogowywanie - DELETE /users/me/token (private route)
+# Route do wylogowania - DELETE /users/me/token (private route)
 Dodajemy route do wylogowania
+
+# Testowanie DELETE /users/me/token
+Dodajemy test sprawdzający czy token jest usuwany

@@ -240,6 +240,25 @@ describe('server.js', () => {
                 });
             });
         });
+
+        describe('DELETE /users/me/token', () => {
+            test('should remove auth token on logout', done => {
+                request(app)
+                .delete('/users/me/token')
+                .set('x-auth', users[0].tokens[0].token)
+                .expect(200)
+                .end((err, res) => {
+                    if(err){
+                        return done(err);
+                    }
+                    // sprawdza, czy tablica tokenów dla użytkownika nie zawiera żadnego tokenu
+                    User.findById(users[0]._id).then(user => {
+                        expect(user.tokens.length).toBe(0);
+                        done();
+                    }).catch(err => done(err));
+                });
+            })
+        });
         
     });
 });
