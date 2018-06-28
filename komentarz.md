@@ -615,3 +615,6 @@ Przy logowaniu dodajemy generowanie tokenu autoryzacji, który będzie wysyłany
 Tworzymy dwa testy:
 1. Z poprawnymi danymi logowania - wtedy powinien zostać zwrócony token 
 2. Niepoprawnych danych - nie powinien zostać zwrócony token, status 400 - bad request
+
+# Wylogowywanie - DELETE /users/me/token (private route)
+Dodajemy route do wylogowania

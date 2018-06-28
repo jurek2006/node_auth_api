@@ -64,9 +64,6 @@ app.get('/', (req, res) => {
 app.post('/users', (req, res) => {
     const user = new User(_.pick(req.body, ['email', 'password']));
 
-    console.log(req.body);
-    
-
     user.save()
         .then(user => {
             return user.generateAuthToken();
@@ -93,12 +90,24 @@ app.post('/users/login', (req, res) => {
     });
 });
 
+
 // ROUTES Z AUTENTYKACJĄ
 
 // prywatna route
 app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
 });
+
+// route do wylogowywania
+app.delete('/users/me/token', authenticate, (req, res) => {
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send();
+    }), () => {
+        res.status(400).send();
+        
+    }
+});
+
 
 if(!module.parent){
     app.listen(3000, () => {
