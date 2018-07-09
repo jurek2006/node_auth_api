@@ -4,6 +4,8 @@
   "description": "API z autentykacją, dla utrwalenia, na podstawie kursu nodejs",
   "main": "server.js",
   "scripts": {
+    "start": "node server/server.js",
+    "start-watch": "nodemon --exec 'npm start'",
     "test": "jest",
     "test-watch": "nodemon --exec \"npm test\""
   },
