@@ -621,3 +621,6 @@ Dodajemy route do wylogowania
 
 # Testowanie DELETE /users/me/token
 Dodajemy test sprawdzający czy token jest usuwany
+
+# Modyfikacja modelu todo i routes POST /todos i GET /todos
+Modyfikujemy model i routes tak, aby przy tworzeniu todo miało zapisywane, który użytkownik je utworzył. I później wyświetlane były todos tylko dla zalogowanego użytkownika.

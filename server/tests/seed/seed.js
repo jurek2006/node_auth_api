@@ -5,8 +5,8 @@ const {Todo} = require('../../models/todo');
 const {User} = require('../../models/user');
 
 const todos = [
-    {_id: new ObjectID(), text: 'First todo'},
-    {_id: new ObjectID(), text: 'Second todo'}
+    {_id: new ObjectID(), text: 'First todo', _creator: userOneId},
+    {_id: new ObjectID(), text: 'Second todo', _creator: userTwoId}
 ];
 
 const todosRemoveAndAdd = done => {

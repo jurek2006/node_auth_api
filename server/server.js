@@ -13,13 +13,14 @@ const {authenticate} = require('./middleware/middleware');
 const app = express();
 app.use(bodyParser.json());
 
-// route dodająca todo (z polem text) do bazy
-app.post('/todos', (req, res) => {
+// route prywatna (wymaga zalogowanego użytkownika) dodająca todo (z polem text) do bazy (zapamiętując id użytkownika, który je utworzył)
+app.post('/todos', authenticate, (req, res) => {
 
     // zapisanie przekazanego todo
     const newTodo = new Todo({
         
-        text: req.body.text
+        text: req.body.text,
+        _creator: req.user._id
     });
 
     newTodo.save()
@@ -30,9 +31,11 @@ app.post('/todos', (req, res) => {
     });
 });
 
-// route zwracająca wszystkie todos z bazy danych
-app.get('/todos', (req, res) => {
-    Todo.find({}).then(todos => {
+// route prywatna zwracająca wszystkie todos utworzone przez zalogowanego użytkownika
+app.get('/todos', authenticate, (req, res) => {
+    Todo.find({
+        _creator: req.user._id
+    }).then(todos => {
         res.send({todos})
     }).catch(err => {
         res.status(400).send(err);
