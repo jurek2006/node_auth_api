@@ -4,6 +4,10 @@ const jwt = require('jsonwebtoken');
 const {Todo} = require('../../models/todo');
 const {User} = require('../../models/user');
 
+// użytkownicy do testów
+const userOneId = new ObjectID();
+const userTwoId = new ObjectID();
+
 const todos = [
     {_id: new ObjectID(), text: 'First todo', _creator: userOneId},
     {_id: new ObjectID(), text: 'Second todo', _creator: userTwoId}
@@ -16,9 +20,6 @@ const todosRemoveAndAdd = done => {
     }).then(() => done());
 }
 
-// użytkownicy do testów
-const userOneId = new ObjectID();
-const userTwoId = new ObjectID();
 
 const users = [{
         // użytkownik z ważnym tokenem autentykacji

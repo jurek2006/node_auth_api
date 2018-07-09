@@ -11,9 +11,9 @@ const {todos, todosRemoveAndAdd, users, populateUsers} = require('../tests/seed/
 
 
 describe('server.js', () => {
+    beforeEach(populateUsers); 
 
     describe('POST /todos', () => {
-
         beforeEach(todosRemoveAndAdd); //przed każdym z testów, bo modyfikują one todos
 
         test('should create a new todo', done => {
@@ -21,6 +21,7 @@ describe('server.js', () => {
 
             request(app)
             .post('/todos')
+            .set('x-auth', users[0].tokens[0].token)
             .send({text: todo_text})
             .expect(200)
             .expect(res => {
@@ -42,6 +43,7 @@ describe('server.js', () => {
         test('should not create todo with invalid body data', done => {
             request(app)
             .post('/todos')
+            .set('x-auth', users[0].tokens[0].token)
             .send({})
             .expect(400)
             .end((err, res) => {
@@ -54,6 +56,19 @@ describe('server.js', () => {
                     done();
                 }).catch(err => done(err));
             })
+        });
+    });
+
+    describe('GET /todos', () => {
+        test('should get all todos created by user 0', done => {
+            request(app)
+            .get('/todos')
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(200)
+            .expect(res => {
+                expect(res.body.todos.length).toBe(1);
+            })
+            .end(done);
         });
     });
 
@@ -77,7 +92,7 @@ describe('server.js', () => {
             .end(done);
         });
 
-        test('shpult return 404 for non-object ids', done => {
+        test('should return 404 for non-object ids', done => {
             request(app)
             .get('/todos/123')
             .expect(404)
