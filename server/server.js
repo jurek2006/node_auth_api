@@ -13,52 +13,6 @@ const {authenticate} = require('./middleware/middleware');
 const app = express();
 app.use(bodyParser.json());
 
-// route prywatna (wymaga zalogowanego użytkownika) dodająca todo (z polem text) do bazy (zapamiętując id użytkownika, który je utworzył)
-app.post('/todos', authenticate, (req, res) => {
-
-    // zapisanie przekazanego todo
-    const newTodo = new Todo({
-        
-        text: req.body.text,
-        _creator: req.user._id
-    });
-
-    newTodo.save()
-    .then( doc => {
-        res.send(doc);
-    }).catch(err => {
-        res.status(400).send(err);
-    });
-});
-
-// route prywatna zwracająca wszystkie todos utworzone przez zalogowanego użytkownika
-app.get('/todos', authenticate, (req, res) => {
-    Todo.find({
-        _creator: req.user._id
-    }).then(todos => {
-        res.send({todos})
-    }).catch(err => {
-        res.status(400).send(err);
-    });
-});
-
-// route zwracająca todo o zadanym id
-app.get('/todos/:id', (req, res) => {
-    const id = req.params.id;
-
-    if(!ObjectID.isValid(id)){
-        return res.status(404).send();
-    }
-
-    Todo.findById(id).then(todo => {
-        if(!todo) {
-            return res.status(404).send();
-        }
-        res.send({todo});
-    }).catch(err => res.status(400).send());
-    
-});
-
 app.get('/', (req, res) => {
     res.send('<h1>Witaj w node-auth-api</h1>');
 });
@@ -95,6 +49,104 @@ app.post('/users/login', (req, res) => {
 
 
 // ROUTES Z AUTENTYKACJĄ
+
+// route prywatna (wymaga zalogowanego użytkownika) dodająca todo (z polem text) do bazy (zapamiętując id użytkownika, który je utworzył)
+app.post('/todos', authenticate, (req, res) => {
+
+    // zapisanie przekazanego todo
+    const newTodo = new Todo({
+        
+        text: req.body.text,
+        completed: req.body.completed,
+        _creator: req.user._id
+    });
+
+    newTodo.save()
+    .then( doc => {
+        res.send(doc);
+    }).catch(err => {
+        res.status(400).send(err);
+    });
+});
+
+// route prywatna zwracająca wszystkie todos utworzone przez zalogowanego użytkownika
+app.get('/todos', authenticate, (req, res) => {
+    Todo.find({
+        _creator: req.user._id
+    }).then(todos => {
+        res.send({todos})
+    }).catch(err => {
+        res.status(400).send(err);
+    });
+});
+
+// route zwracająca todo o zadanym id
+app.get('/todos/:id', authenticate, (req, res) => {
+    const id = req.params.id;
+
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send();
+    }
+
+    Todo.findOne({
+            _id: id,
+            _creator: req.user._id
+        }).then(todo => {
+        if(!todo) {
+            return res.status(404).send();
+        }
+        res.send({todo});
+    }).catch(err => res.status(400).send());
+    
+});
+
+// route usuwająca todo o zadanym id dla zautentyfikowanego twórcy tego todo
+app.delete('/todos/:id', authenticate, (req, res) => {
+    const id = req.params.id;
+
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send();
+    }
+
+    Todo.findOneAndRemove({
+        _id: id,
+        _creator: req.user._id
+    }).then(todo => {
+        if(!todo) {
+            return res.status(404).send();
+        }
+        res.status(200).send({todo});
+    }).catch(err => res.status(404).send());
+});
+
+// route modyfikująca todo o zadanym id
+app.patch('/todos/:id', authenticate, (req, res) => {
+    const id = req.params.id;
+    const body = _.pick(req.body, ['text', 'completed']);
+    
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send();
+    }
+    
+    if(_.isBoolean(body.completed) && body.completed){
+        body.completedAt = new Date().getTime();
+    } else {
+        body.completed = false;
+        body.completedAt = null;
+    }
+    
+    // Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then(todo => {
+        Todo.findOneAndUpdate({
+                _id: id,
+                _creator: req.user._id
+            }, {$set: body}, {new: true}).then(todo => {
+                if(!todo){
+                    return res.status(404).send();
+                }
+
+                res.send({todo});
+            }).catch(err => { res.status(400).send(); });
+});
 
 // prywatna route
 app.get('/users/me', authenticate, (req, res) => {

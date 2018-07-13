@@ -627,3 +627,5 @@ Modyfikujemy model i routes tak, aby przy tworzeniu todo zapisywało, który uż
 
 # Testowanie routes POST /todos i GET /todos
 Zmiana testów, żeby uwzględniały prywatność obu routes.
+
+# Modyfikacja routes GET /todos/:id, dodanie DELETE /todos/:id i PATCH /todos/:id

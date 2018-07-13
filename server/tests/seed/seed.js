@@ -10,7 +10,7 @@ const userTwoId = new ObjectID();
 
 const todos = [
     {_id: new ObjectID(), text: 'First todo', _creator: userOneId},
-    {_id: new ObjectID(), text: 'Second todo', _creator: userTwoId}
+    {_id: new ObjectID(), text: 'Second todo', completed: true, completedAt: 123, _creator: userTwoId}
 ];
 
 const todosRemoveAndAdd = done => {
@@ -32,10 +32,14 @@ const users = [{
         }]
     },
     {
-        // użytkownik bez tokenu autentykacji
+        // drugi użytkownik (także z tokenem autentykacji)
         _id: userTwoId,
         email: 'notgood@node.pl',
         password: 'costam2',
+        tokens: [{
+            access: 'auth',
+            token: jwt.sign({_id:userTwoId.toHexString(), access: 'auth'}, 'secret123').toString()
+        }]
     }
 ];
 

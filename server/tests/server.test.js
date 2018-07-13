@@ -78,6 +78,7 @@ describe('server.js', () => {
         test('should get todo with doc matching given id', done => {
             request(app)
             .get(`/todos/${todos[0]._id}`)
+            .set('x-auth', users[0].tokens[0].token)
             .expect(200)
             .expect(res => {
                 expect(res.body.todo.text).toBe(todos[0].text);
@@ -88,6 +89,7 @@ describe('server.js', () => {
         test('should return 404 if todo not found', done => {
             request(app)
             .get(`/todos/${new ObjectID()}`)
+            .set('x-auth', users[0].tokens[0].token)
             .expect(404)
             .end(done);
         });
@@ -95,6 +97,155 @@ describe('server.js', () => {
         test('should return 404 for non-object ids', done => {
             request(app)
             .get('/todos/123')
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(404)
+            .end(done);
+        });
+
+        test('should not return todo doc created by other user', done => {
+            request(app)
+            .get(`/todos/${todos[0]._id}`)
+            .set('x-auth', users[1].tokens[0].token)
+            .expect(404)
+            .end(done)
+        });
+    });
+
+    describe('PATCH /todos/:id', () => {
+        beforeEach(done => todosRemoveAndAdd(done)); //przed każdym testem, bo modyfikują one todos
+
+        test('should update the todo and set it to completed', done => {
+            const text = 'Modified text';
+
+            request(app)
+            .patch(`/todos/${todos[0]._id}`)
+            .set('x-auth', users[0].tokens[0].token)
+            .send({text, completed: true})
+            .expect(200)
+            .expect(res => {
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBeTruthy();
+                expect(typeof res.body.todo.completedAt).toBe('number');
+            })
+            .end((err, res) => {
+                if(err){
+                    return done(err);
+                }
+
+                Todo.findById(todos[0]._id).then(todo => {
+                    expect(todo).toBeDefined();
+                    expect(todo.text).toBe(text);
+                    expect(todo.completed).toBeTruthy();
+                    expect(typeof todo.completedAt).toBe('number');
+                    done();
+                }).catch(err => done(err));
+            });
+        });
+
+        test('should not update todo created by other user', done => {
+            request(app)
+            .patch(`/todos/${todos[0]._id}`)
+            .set('x-auth', users[1].tokens[0].token)
+            .send({text: 'NotModified', completed: true})
+            .expect(404)
+            .end((err, res) => {
+                if(err){
+                    return done(err);
+                }
+
+                // sprawdzenie czy nie zmodyfikowano danych todo w bazie
+                Todo.findById(todos[0]._id).then(todo => {
+                    expect(todo.text).toBe(todos[0].text);
+                    expect(todo.completed).toBeFalsy();
+                    expect(todo.completedAt).toBeNull();
+                    done();
+                }).catch(err => done(err));
+            });
+        });
+
+        test('should return 401 when user not authenticated', done => {
+            request(app)
+            .patch(`/todos/${todos[0]._id}`)
+            .send({text: 'NotModified', completed: true})
+            .expect(401)
+            .end((err, res) => {
+                if(err){
+                    return done(err);
+                }
+
+                // sprawdzenie czy nie zmodyfikowano danych todo w bazie
+                Todo.findById(todos[0]._id).then(todo => {
+                    expect(todo.text).toBe(todos[0].text);
+                    expect(todo.completed).toBeFalsy();
+                    expect(todo.completedAt).toBeNull();
+                    done();
+                }).catch(err => done(err));
+            });
+        });
+
+        test('should clear completedAt when todo is not completed', done => {
+            request(app)
+            .patch(`/todos/${todos[1]._id}`)
+            .set('x-auth', users[1].tokens[0].token)
+            .send({completed: false})
+            .expect(200)
+            .expect(res => {
+                expect(res.body.todo.text).toBe(todos[1].text);
+                expect(res.body.todo.completed).toBeFalsy();
+                expect(res.body.todo.completedAt).toBeNull();
+            })
+            .end(done);
+        });
+    });
+
+    describe('DELETE /todos/:id,', () => {
+        beforeEach(done => todosRemoveAndAdd(done)); //przed każdym testem, bo modyfikują one todos
+        test('should delete todo with given id if owner authenticated', done => {
+            request(app)
+            .delete(`/todos/${todos[0]._id}`)
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(200)
+            .end((err, res) => {
+                if(err){
+                    return done(err);
+                }
+
+                Todo.findById(todos[0]._id).then(todo => {
+                    expect(todo).toBeNull();
+                    done();
+                }).catch(err => done(err));
+            });
+        });
+
+        test('should not delete todo with given id if not owner authenticated', done => {
+            request(app)
+            .delete(`/todos/${todos[0]._id}`)
+            .set('x-auth', users[1].tokens[0].token)
+            .expect(404)
+            .end((err, res) => {
+                if(err){
+                    return done(err);
+                }
+
+                Todo.findById(todos[0]._id).then(todo => {
+                    expect(todo).toBeDefined();
+                    done();
+                }).catch(err => done(err));
+            });
+        });
+
+        test('should return 404 if todo not found', done => {
+            request(app)
+            .delete(`/todos/${new ObjectID()}`)
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(404)
+            .end(done);
+        });
+
+        test('should return 404 for non-object ids', done => {
+            request(app)
+            .delete('/todos/123')
+            .set('x-auth', users[0].tokens[0].token)
             .expect(404)
             .end(done);
         });
