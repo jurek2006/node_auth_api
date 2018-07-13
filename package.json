@@ -6,12 +6,15 @@
   "scripts": {
     "start": "node server/server.js",
     "start-watch": "nodemon --exec 'npm start'",
-    "test": "jest",
+    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && jest",
     "test-watch": "nodemon --exec \"npm test\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jurek2006/node_auth_api.git"
+  },
+  "engines": {
+    "node": "10.5.0"
   },
   "author": "Jurek Skowron",
   "license": "ISC",

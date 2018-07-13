@@ -1,4 +1,6 @@
 // server/server.js
+
+require('./config/config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
@@ -163,10 +165,11 @@ app.delete('/users/me/token', authenticate, (req, res) => {
     }
 });
 
+const port = process.env.PORT || 3000;
 
 if(!module.parent){
-    app.listen(3000, () => {
-        console.log('Server started on port 3000');
+    app.listen(port, () => {
+        console.log(`Server started on port ${port}`);
     });
 }
 
